@@ -29,7 +29,7 @@ class Blog(models.Model):
     slug = models.SlugField(max_length=200, unique=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE) # on delete category all posts related category will be deleted
     author = models.ForeignKey(User, on_delete=models.CASCADE) # on delete user all posts related user will be deleted
-    featured_image = models.ImageField(upload_to='uploads/%Y/%m/%d/', blank=True)
+    featured_image = models.ImageField(upload_to='uploads/%Y/%m/%d/', blank=False, null=False)
     short_description = models.TextField(max_length=200)
     blog_body = models.TextField(max_length=5000)
     status = models.CharField(max_length=20, default='Draft', choices=STATUS_CHOICES)  # draft = 0, published = 1 status may be draft or published so we made dropdown
