@@ -6,7 +6,7 @@ def home(request):
     featured_posts = Blog.objects.filter(is_featured=True, status='Published')
     posts = Blog.objects.filter(is_featured=False, status='Published').order_by('-created_at')
     context = {
-        'categories': categories,
+        # 'categories': categories, # removed as we are using context processor for categories
         'featured_posts': featured_posts,
         'posts': posts,
     }
