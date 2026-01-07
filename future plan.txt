@@ -1,6 +1,0 @@
-description/body field ma html editor add garnya: html code lekhnamilnya, bold option header haruko option dekhaunya wala rakhnya
-home page ko banner ma multiple advertiser rakhnya with marquee tag with hyperlink
-home page change: a. contact page (direct email goes)
-                  b. video page (video can be post too)
-                  c. dynamic comment like youtube where user can reply each other multiple time too if possible made like youtube (image also can be upload as comment)
-                  d. separate page for (youtube, google, and google dictionary search) link in student portol system.
