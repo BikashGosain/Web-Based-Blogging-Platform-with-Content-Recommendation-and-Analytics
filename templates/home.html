@@ -60,13 +60,17 @@
         <p class="mb-0"><em>{{ about.about_description }}</em></p>
       </div>
 
+
+      {% if social_links %}
       <div class="p-3">
         <h4 class="font-italic">Follow Us</h4>
         <ol class="list-unstyled">
-          <li><a href="#">GitHub</a></li>
-          <li><a href="#">LinkedIn</a></li>
+          {% for social_link in social_links %}
+          <li><a href="{{ social_link.link }}" target="_blank">{{ social_link.platform }}</a></li>
+          {% endfor %}
         </ol>
       </div>
+      {% endif %}
     </aside><!-- /.blog-sidebar -->
 
   </div><!-- /.row -->
