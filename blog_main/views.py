@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from blogs.models import Blog, Category
 from about_us.models import AboutUs
 from .forms import RegistrationForm
-
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import auth
 def home(request):
     categories = Category.objects.all()
     featured_posts = Blog.objects.filter(is_featured=True, status='Published')
@@ -27,7 +28,7 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect('login')
         else:
             print(form.errors)
     else:
@@ -38,3 +39,22 @@ def register(request):
         'form': form,
         }
     return render(request, 'register.html', context)
+
+def login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth.login(request, user)
+            return redirect('home')
+    else:
+        form = AuthenticationForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'login.html', context)
+
+def logout(request):
+    auth.logout(request)
+    return redirect('home')
