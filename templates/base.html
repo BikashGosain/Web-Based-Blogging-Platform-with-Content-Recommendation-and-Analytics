@@ -23,10 +23,11 @@
                 </div>
 
                 <!-- search -->
-                <div class="col-4">
+                <div class="col-4 d-flex justify-content-center align-items-center">
                     <form class="form-inline" method="GET" action="{% url 'search' %}">
                         <div class="input-group">
-                            <input class="form-control" type="text" name="keyword" placeholder="Enter search term..." aria-label="Search" value="{{keyword}}" >
+                            <input class="form-control" type="text" name="keyword" placeholder="Enter search term..."
+                                aria-label="Search" value="{{keyword}}">
                             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                         </div>
                     </form>
@@ -34,7 +35,7 @@
 
                 <div class="col-4 d-flex justify-content-end align-items-center">
                     <a class="btn btn-sm btn-warning" href="#">Login</a> &nbsp;
-                    <a class="btn btn-sm btn-outline-secondary" href="#">Register</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
                 </div>
             </div>
         </header>
