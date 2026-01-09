@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'social_links',
     'crispy_forms',
     'crispy_bootstrap4',
+    'dashboards',
 
 ]
 

@@ -40,6 +40,7 @@
                     <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
                     {% else %}
                     <span>Welcome, {{ user.username }}</span> &nbsp;
+                    <span> <a class="btn btn-sm btn-outline-secondary" href="{% url 'dashboard' %}">Dashboard</a></span> &nbsp;
                     <span><a class="btn btn-sm btn-outline-secondary" href="{% url 'logout' %}">Logout</a></span>
                     {% endif %}
                 </div>
