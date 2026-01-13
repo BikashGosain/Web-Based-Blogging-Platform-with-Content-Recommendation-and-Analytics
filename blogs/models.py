@@ -26,7 +26,7 @@ STATUS_CHOICES = (
 
 class Blog(models.Model):
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE) # on delete category all posts related category will be deleted
     author = models.ForeignKey(User, on_delete=models.CASCADE) # on delete user all posts related user will be deleted
     featured_image = models.ImageField(upload_to='uploads/%Y/%m/%d/', blank=False, null=False)
