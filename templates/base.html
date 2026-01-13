@@ -12,7 +12,32 @@
     <link href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
     <link href="{% static 'css/blog.css' %}" rel="stylesheet">
+
+    <link href="{% static 'css/message.css' %}" rel="stylesheet">
+
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const toasts = document.querySelectorAll(".toast");
+
+    toasts.forEach((toast) => {
+        setTimeout(() => {
+            toast.classList.add("hide");
+            setTimeout(() => toast.remove(), 400);
+        }, 5000); // auto close after 5 seconds
+    });
+});
+
+function closeToast(element) {
+    const toast = element.parentElement;
+    toast.classList.add("hide");
+    setTimeout(() => toast.remove(), 400);
+}
+</script>
+
+
 </head>
 
 <body>

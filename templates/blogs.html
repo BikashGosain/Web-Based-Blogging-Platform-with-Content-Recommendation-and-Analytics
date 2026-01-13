@@ -23,6 +23,41 @@
                 <section class="mb-5">
                     <p class="fs-5 mb-4">{{ single_blog.short_description }}</p>
                     <p class="fs-5 mb-4">{{ single_blog.blog_body }}</p>
+
+
+                    <!-- comment section -->
+                    <div class="mt-5">
+                        <h4 class="mb-4">Comments ({{ comment_count }})</h4>
+                        {% for comment in comments %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <small class="text-muted"><strong>{{ comment.user }} - {{ comment.created_at|timesince }} ago</strong></small>
+                                <p class="card-text">{{ comment.comment }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>No comments yet.</p>
+                        {% endfor %}
+
+<br>
+<div class="form-group">
+
+    {% if user.is_authenticated %}
+    <h4 class="mb-4">Leave a Comment</h4>
+    <form method="post" action="" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <textarea class="form-control" name="comment" placeholder="Write your comment here..." required></textarea>
+        </div>
+        <input type="submit" value="Submit Comment" class="btn btn-primary mt-2">
+    </form>
+
+    {% else %}
+    <p>Please <a href="{% url 'login' %}">login</a> to leave a comment.</p>
+    {% endif %}
+</div>
+
+                    </div>
                     </section>
             </article>
         </div>

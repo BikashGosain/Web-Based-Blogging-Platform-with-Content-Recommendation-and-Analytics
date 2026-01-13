@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 
 <div class="row">
@@ -12,6 +11,21 @@
     <div class="col-md-9">
         {% if perms.auth.view_user %}
         <h2>All Users</h2>
+
+{% if messages %}
+  <div id="toast-container">
+    {% for message in messages %}
+      <div class="toast toast-{{ message.tags }}">
+        <span class="toast-message">{{ message }}</span>
+        <span class="toast-close" onclick="closeToast(this)">&times;</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+
+
+
         <a href="{% url 'add_user' %}" class="btn btn-dark text-light float-right mb-2">Add New User</a>
         <table class="table table-hover">
             <thead>

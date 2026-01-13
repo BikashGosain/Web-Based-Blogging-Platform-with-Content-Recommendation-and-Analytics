@@ -1,9 +1,12 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from blogs.models import Category, Blog
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from .forms import BlogPostForm, CategoryForm, AddUserForm, EditUserForm
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
+
+# for message
+from django.contrib import messages
 # Create your views here.
 
 @login_required(login_url='login')
@@ -47,6 +50,7 @@ def edit_category(request, pk):
     }
     return render(request, 'dashboard/edit_category.html', context)
 
+@permission_required('auth.delete_user', raise_exception=True)
 def delete_category(request, pk):
     category = get_object_or_404(Category, pk=pk)
     category.delete()
@@ -96,6 +100,7 @@ def edit_post(request, pk):
     }
     return render(request, 'dashboard/edit_post.html', context)
 
+@permission_required('auth.delete_user', raise_exception=True)
 def delete_post(request, pk):
     post = get_object_or_404(Blog, pk=pk)
     post.delete()
@@ -113,7 +118,11 @@ def add_user(request):
     if request.method == 'POST':
         form = AddUserForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()  # capture created user
+            messages.success(
+                request,
+                f'User "{user.username}" added successfully ✅'
+            )
             return redirect('users')
     form = AddUserForm()
     context = {
@@ -128,15 +137,19 @@ def edit_user(request, pk):
         form = EditUserForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
+            messages.success(request, f'Username "{user}" updated successfully. ✅')
             return redirect('users')
-    form = EditUserForm(instance=user)
+    else:
+        form = EditUserForm(instance=user)
     context = {
         'form': form,
         'user': user,
     }
     return render(request, 'dashboard/edit_user.html', context)
 
+@permission_required('auth.delete_user', raise_exception=True)
 def delete_user(request, pk):
     user = get_object_or_404(User, pk=pk)
     user.delete()
+    messages.success(request, f'Username "{user}" deleted successfully. ✅')
     return redirect('users')
