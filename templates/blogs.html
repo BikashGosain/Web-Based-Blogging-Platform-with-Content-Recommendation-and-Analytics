@@ -76,18 +76,33 @@
                                     <strong>{{ comment.user }} · {{ comment.created_at|timesince }} ago</strong>
                                 </small>
 
-<!-- for edit and delete comment in main comment only -->
+                                <!-- for edit and delete comment in main comment only -->
+                                <div id="edit-form-{{ comment.id }}" class="d-none mt-2">
+                                    <textarea class="form-control mb-2"
+                                        id="edit-text-{{ comment.id }}">{{ comment.comment }}</textarea>
+
+                                    <button class="btn btn-sm btn-primary" onclick="submitEdit({{ comment.id }})">
+                                        Save
+                                    </button>
+
+                                    <button class="btn btn-sm btn-secondary" onclick="toggleEditForm({{ comment.id }})">
+                                        Cancel
+                                    </button>
+                                </div>
+
+                                <!-- for edit and delete comment in main comment only -->
 
 
-<a href=""><i class="fa fa-edit text-success"></i></a>
-                    &nbsp;
-{% if request.user == comment.user %}
-<button type="button"
-        class="btn btn-link text-danger p-0 ms-2"
-        onclick="deleteComment({{ comment.id }})">
-    <i class="fa fa-trash text-danger"></i>
-</button>
-{% endif %}
+                                {% if request.user == comment.user %}
+                                <button class="btn btn-link p-0 text-success"
+                                    onclick="toggleEditForm({{ comment.id }})">
+                                    <i class="fa fa-edit"></i>
+                                </button>&nbsp;
+                                <button type="button" class="btn btn-link text-danger p-0 ms-2"
+                                    onclick="deleteComment({{ comment.id }})">
+                                    <i class="fa fa-trash text-danger"></i>
+                                </button>
+                                {% endif %}
 
 
 
@@ -131,11 +146,11 @@
 
 
                         <br>
-                       
+
                     </div>
                 </section>
             </article>
-            
+
         </div>
         <!-- Side widgets-->
         <div class="col-lg-4">
@@ -171,62 +186,108 @@
 </div>
 
 
- <!-- Replace your JS with THIS (ONLY ONE SCRIPT, bottom of blogs.html) so that no reload (comment no reload, reply on that comment no reload but reply on that reply take reload) Now no reload now -->
-                        <script>
-                            function toggleReplyForm(id) {
-                                const form = document.getElementById(`reply-form-${id}`);
-                                if (form) {
-                                    form.classList.toggle('d-none');
-                                }
-                            }
-
-                            document.addEventListener('submit', function (e) {
-                                const form = e.target;
-
-                                // 🔑 This catches ALL reply forms (including nested replies)
-                                if (form.querySelector('input[name="parent_id"]')) {
-                                    e.preventDefault(); // STOP page reload
-
-                                    const formData = new FormData(form);
-
-                                    fetch("", {
-                                        method: "POST",
-                                        body: formData,
-                                        headers: {
-                                            "X-CSRFToken": form.querySelector('[name=csrfmiddlewaretoken]').value
-                                        }
-                                    })
-                                        .then(res => {
-                                            if (res.ok) {
-                                                location.reload(); // TEMP: confirms everything works
-                                            }
-                                        });
-                                }
-                            });
-                        </script>
+<!-- Replace your JS with THIS (ONLY ONE SCRIPT, bottom of blogs.html) so that no reload (comment no reload, reply on that comment no reload but reply on that reply take reload) Now no reload now -->
 <script>
-function deleteComment(commentId) {
-    if (!confirm("Delete this comment?")) return;
-
-    fetch("{% url 'delete_comment' 0 %}".replace("0", commentId), {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCSRFToken(),
+    function toggleReplyForm(id) {
+        const form = document.getElementById(`reply-form-${id}`);
+        if (form) {
+            form.classList.toggle('d-none');
         }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById(`comment-${commentId}`).remove();
-        } else {
-            alert(data.error || "Delete failed");
+    }
+
+    document.addEventListener('submit', function (e) {
+        const form = e.target;
+
+        // 🔑 This catches ALL reply forms (including nested replies)
+        if (form.querySelector('input[name="parent_id"]')) {
+            e.preventDefault(); // STOP page reload
+
+            const formData = new FormData(form);
+
+            fetch("", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": form.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+                .then(res => {
+                    if (res.ok) {
+                        location.reload(); // TEMP: confirms everything works
+                    }
+                });
         }
     });
-}
+</script>
+<!-- for Delete comment -->
+<script>
+    function deleteComment(commentId) {
+        if (!confirm("Delete this comment?")) return;
 
-function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
-}
+        fetch("{% url 'delete_comment' 0 %}".replace("0", commentId), {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`comment-${commentId}`).remove();
+                } else {
+                    alert(data.error || "Delete failed");
+                }
+            });
+    }
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+</script>
+
+
+<!-- for edit comment -->
+<script>
+    function toggleEditForm(id) {
+        const form = document.getElementById(`edit-form-${id}`);
+        form.classList.toggle('d-none');
+    }
+
+    function submitEdit(commentId) {
+        const textarea = document.getElementById(`edit-text-${commentId}`);
+        const newText = textarea.value.trim();
+
+        if (!newText) {
+            alert("Comment cannot be empty");
+            return;
+        }
+
+        fetch("{% url 'edit_comment' 0 %}".replace("0", commentId), {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `comment=${encodeURIComponent(newText)}`
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // 🔁 Update comment text instantly
+                    document
+                        .querySelector(`#comment-${commentId} p`)
+                        .innerText = data.comment;
+
+                    toggleEditForm(commentId);
+                } else {
+                    alert(data.error || "Edit failed");
+                }
+            });
+    }
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
 </script>
 
 

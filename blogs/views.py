@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from .models import Blog, Category, Comment
 from django.db.models import Q
@@ -72,7 +73,30 @@ def delete_comment(request, comment_id):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+@login_required
+@require_POST
+def edit_comment(request, comment_id):
+    try:
+        comment = Comment.objects.get(id=comment_id)
+    except Comment.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Comment not found"})
 
+    # 🔐 Permission check
+    if comment.user != request.user:
+        return JsonResponse({"success": False, "error": "Permission denied"})
+
+    new_text = request.POST.get("comment", "").strip()
+
+    if not new_text:
+        return JsonResponse({"success": False, "error": "Comment cannot be empty"})
+
+    comment.comment = new_text
+    comment.save()
+
+    return JsonResponse({
+        "success": True,
+        "comment": comment.comment
+    })
 
 def search(request):
     keyword = request.GET.get('keyword')

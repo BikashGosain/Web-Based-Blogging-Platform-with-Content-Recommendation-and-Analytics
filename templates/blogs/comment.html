@@ -9,17 +9,30 @@
                 Replying to <strong>@{{ comment.parent.user.username }}</strong>
             </small>
 
-            <!-- for edit and delete comment in all other reply of main comment and another reply comments -->
+            <!-- for edit replys and reply on reply too -->
+            <div id="edit-form-{{ comment.id }}" class="d-none mt-2">
+                <textarea class="form-control mb-2" id="edit-text-{{ comment.id }}">{{ comment.comment }}</textarea>
 
-<a href=""><i class="fa fa-edit text-success"></i></a>
-                    &nbsp;
-{% if request.user == comment.user %}
-<button type="button"
-        class="btn btn-link text-danger p-0 ms-2"
-        onclick="deleteComment({{ comment.id }})">
-    <i class="fa fa-trash text-danger"></i>
-</button>
-{% endif %}
+                <button class="btn btn-sm btn-primary" onclick="submitEdit({{ comment.id }})">
+                    Save
+                </button>
+
+                <button class="btn btn-sm btn-secondary" onclick="toggleEditForm({{ comment.id }})">
+                    Cancel
+                </button>
+            </div>
+
+            <!-- fordelete comment in all other reply of main comment and another reply comments -->
+
+            {% if request.user == comment.user %}
+            <button class="btn btn-link p-0 text-success" onclick="toggleEditForm({{ comment.id }})">
+                <i class="fa fa-edit"></i>
+            </button>&nbsp;
+            <button type="button" class="btn btn-link text-danger p-0 ms-2" onclick="deleteComment({{ comment.id }})">
+                <i class="fa fa-trash text-danger"></i>
+            </button>
+            {% endif %}
+
 
 
             {% endif %}
