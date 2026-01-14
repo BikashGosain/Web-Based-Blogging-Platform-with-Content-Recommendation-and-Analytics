@@ -1,4 +1,4 @@
-<div class="ms-{{ level|default:0 }} mt-3">
+<div id="comment-{{ comment.id }}" class="ms-{{ level|default:0 }} mt-3">
     <div class="card">
         <div class="card-body">
             <small class="text-muted">
@@ -8,6 +8,20 @@
             <small class="text-muted">
                 Replying to <strong>@{{ comment.parent.user.username }}</strong>
             </small>
+
+            <!-- for edit and delete comment in all other reply of main comment and another reply comments -->
+
+<a href=""><i class="fa fa-edit text-success"></i></a>
+                    &nbsp;
+{% if request.user == comment.user %}
+<button type="button"
+        class="btn btn-link text-danger p-0 ms-2"
+        onclick="deleteComment({{ comment.id }})">
+    <i class="fa fa-trash text-danger"></i>
+</button>
+{% endif %}
+
+
             {% endif %}
             <p>{{ comment.comment }}</p>
 

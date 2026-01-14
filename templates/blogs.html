@@ -70,11 +70,26 @@
                         <h4 class="mb-4">Comments ({{ comment_count }})</h4>
                         {% for comment in comments %}
                         {% if not comment.parent %}
-                        <div class="card mb-3">
+                        <div class="card mb-3" id="comment-{{ comment.id }}">
                             <div class="card-body">
                                 <small class="text-muted">
                                     <strong>{{ comment.user }} · {{ comment.created_at|timesince }} ago</strong>
                                 </small>
+
+<!-- for edit and delete comment in main comment only -->
+
+
+<a href=""><i class="fa fa-edit text-success"></i></a>
+                    &nbsp;
+{% if request.user == comment.user %}
+<button type="button"
+        class="btn btn-link text-danger p-0 ms-2"
+        onclick="deleteComment({{ comment.id }})">
+    <i class="fa fa-trash text-danger"></i>
+</button>
+{% endif %}
+
+
 
                                 <p class="card-text">{{ comment.comment }}</p>
 
@@ -83,6 +98,8 @@
                                     onclick="toggleReplyForm('{{ comment.id }}')">
                                     Reply
                                 </button>
+
+
 
 
                                 <!-- Reply form -->
@@ -187,6 +204,31 @@
                                 }
                             });
                         </script>
+<script>
+function deleteComment(commentId) {
+    if (!confirm("Delete this comment?")) return;
+
+    fetch("{% url 'delete_comment' 0 %}".replace("0", commentId), {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`comment-${commentId}`).remove();
+        } else {
+            alert(data.error || "Delete failed");
+        }
+    });
+}
+
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+</script>
+
 
 
 {% endblock %}
