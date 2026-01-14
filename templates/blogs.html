@@ -13,12 +13,15 @@
                     <!-- Post title-->
                     <h1 class="fw-bolder mb-1">{{ single_blog.title }}</h1>
                     <!-- Post meta content-->
-                    <div class="text-muted fst-italic mb-2">{{ single_blog.created_at | timesince}} ago | BY {{ single_blog.author }}</div>
+                    <div class="text-muted fst-italic mb-2">{{ single_blog.created_at | timesince}} ago | BY {{
+                        single_blog.author }}</div>
                     <!-- Post category-->
-                    <a class="badge bg-warning text-decoration-none text-light" href="{% url 'posts_by_category' single_blog.category.id %}">{{ single_blog.category }}</a>
+                    <a class="badge bg-warning text-decoration-none text-light"
+                        href="{% url 'posts_by_category' single_blog.category.id %}">{{ single_blog.category }}</a>
                 </header>
                 <!-- Preview image figure-->
-                <figure class="mb-4"><img class="img-fluid rounded" src="{{ single_blog.featured_image.url }}" alt="..." /></figure>
+                <figure class="mb-4"><img class="img-fluid rounded" src="{{ single_blog.featured_image.url }}"
+                        alt="..." /></figure>
                 <!-- Post content-->
                 <section class="mb-5">
                     <p class="fs-5 mb-4">{{ single_blog.short_description }}</p>
@@ -29,36 +32,92 @@
                     <div class="mt-5">
                         <h4 class="mb-4">Comments ({{ comment_count }})</h4>
                         {% for comment in comments %}
+                        {% if not comment.parent %}
                         <div class="card mb-3">
                             <div class="card-body">
-                                <small class="text-muted"><strong>{{ comment.user }} - {{ comment.created_at|timesince }} ago</strong></small>
+                                <small class="text-muted">
+                                    <strong>{{ comment.user }} · {{ comment.created_at|timesince }} ago</strong>
+                                </small>
+
                                 <p class="card-text">{{ comment.comment }}</p>
+
+                                <!-- Reply button -->
+                                <button type="button" class="btn btn-link p-0"
+                                    onclick="toggleReplyForm('{{ comment.id }}')">
+                                    Reply
+                                </button>
+
+
+                                <!-- Reply form -->
+                                <form method="POST" class="reply-form mt-2 d-none" id="reply-form-{{ comment.id }}">
+
+                                    {% csrf_token %}
+                                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
+
+                                    <textarea name="comment" class="form-control mb-2" rows="2"
+                                        placeholder="Write a reply..." required></textarea>
+
+                                    <button type="submit" class="btn btn-sm btn-primary">Reply</button>
+                                </form>
+
+
+
+
+                                <!-- Replies -->
+                                {% for reply in comment.replies.all|dictsort:"created_at" %}
+
+                                <div class="ms-4 mt-3 border-start ps-3">
+                                    <small class="text-muted">
+                                        <strong>{{ reply.user }} · {{ reply.created_at|timesince }} ago</strong>
+                                    </small>
+                                    <p>{{ reply.comment }}</p>
+                                </div>
+                                {% endfor %}
                             </div>
                         </div>
+                        {% endif %}
                         {% empty %}
                         <p>No comments yet.</p>
                         {% endfor %}
 
-<br>
-<div class="form-group">
 
-    {% if user.is_authenticated %}
-    <h4 class="mb-4">Leave a Comment</h4>
-    <form method="post" action="" method="POST">
-        {% csrf_token %}
-        <div class="form-group">
-            <textarea class="form-control" name="comment" placeholder="Write your comment here..." required></textarea>
-        </div>
-        <input type="submit" value="Submit Comment" class="btn btn-primary mt-2">
-    </form>
+                        <br>
+                        <div class="form-group">
 
-    {% else %}
-    <p>Please <a href="{% url 'login' %}">login</a> to leave a comment.</p>
-    {% endif %}
-</div>
+                            {% if user.is_authenticated %}
+                            <h4 class="mb-4">Leave a Comment</h4>
+                            <form method="post" action="" method="POST" id="commentForm">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <textarea class="form-control" name="comment"
+                                        placeholder="Write your comment here..." required></textarea>
+                                </div>
+                                <input type="submit" value="Submit Comment" class="btn btn-primary mt-2">
+                            </form>
+
+                            <script>
+                                document.getElementById('commentForm').addEventListener('submit', function (e) {
+                                    e.preventDefault();  // stop page reload
+
+                                    const formData = new FormData(this);
+
+                                    fetch("", {
+                                        method: "POST",
+                                        body: formData,
+                                        headers: {
+                                            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                                        }
+                                    }).then(response => location.reload()); // or update DOM dynamically
+                                });
+                            </script>
+
+                            {% else %}
+                            <p>Please <a href="{% url 'login' %}">login</a> to leave a comment.</p>
+                            {% endif %}
+                        </div>
 
                     </div>
-                    </section>
+                </section>
             </article>
         </div>
         <!-- Side widgets-->
@@ -68,7 +127,7 @@
                 <h4 class="font-italic">Categories</h4>
                 <div class="card-body">
                     <div class="row">
-                        
+
                         <div class="col-sm-6">
                             <ul class="list-unstyled mb-0">
                                 {% for cate in categories %}
@@ -80,16 +139,16 @@
                 </div>
             </div>
             <!-- Side widget-->
-        {% if social_links %}
-      <div class="p-3">
-        <h4 class="font-italic">Follow Us</h4>
-        <ol class="list-unstyled">
-          {% for social_link in social_links %}
-          <li><a href="{{ social_link.link }}" target="_blank">{{ social_link.platform }}</a></li>
-          {% endfor %}
-        </ol>
-      </div>
-      {% endif %}
+            {% if social_links %}
+            <div class="p-3">
+                <h4 class="font-italic">Follow Us</h4>
+                <ol class="list-unstyled">
+                    {% for social_link in social_links %}
+                    <li><a href="{{ social_link.link }}" target="_blank">{{ social_link.platform }}</a></li>
+                    {% endfor %}
+                </ol>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

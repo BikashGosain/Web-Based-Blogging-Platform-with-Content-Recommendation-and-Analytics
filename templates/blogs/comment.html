@@ -1,0 +1,37 @@
+<div class="ms-{{ level|default:0 }} mt-3">
+  <div class="card">
+    <div class="card-body">
+      <small class="text-muted">
+        <strong>{{ comment.user }} · {{ comment.created_at|timesince }} ago</strong>
+      </small>
+
+      <p>{{ comment.comment }}</p>
+
+      <!-- Reply button -->
+      <button type="button"
+              class="btn btn-link p-0"
+              onclick="toggleReplyForm('{{ comment.id }}')">
+        Reply
+      </button>
+
+      <!-- Reply form -->
+      <form method="POST"
+            class="mt-2 d-none"
+            id="reply-form-{{ comment.id }}">
+        {% csrf_token %}
+        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+        <textarea name="comment"
+                  class="form-control mb-2"
+                  rows="2"
+                  placeholder="Write a reply..."
+                  required></textarea>
+        <button type="submit" class="btn btn-sm btn-primary">Reply</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 🔁 RECURSION HAPPENS HERE -->
+  {% for reply in comment.replies.all %}
+    {% include 'blogs/comment.html' with comment=reply level=level|add:1 %}
+  {% endfor %}
+</div>

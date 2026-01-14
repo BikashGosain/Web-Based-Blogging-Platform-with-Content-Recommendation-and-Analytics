@@ -45,6 +45,16 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE) # on delete user all comments related user will be deleted
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE) # on delete blog all comments related blog will be deleted
     comment = models.TextField(max_length=250)
+
+    # for reply button in each comments
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='replies'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

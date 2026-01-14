@@ -28,13 +28,30 @@ def posts_by_category(request, category_id):
 
 def blogs(request, slug):
     single_blog = get_object_or_404(Blog, slug=slug, status='Published')
+    comments = Comment.objects.filter(blog=single_blog).select_related('user').prefetch_related('replies')
+
     if request.method == 'POST':
         comment = Comment()
         comment.user = request.user
         comment.blog = single_blog
-        comment.comment = request.POST['comment'] #'comment ' is for in blogs.html textarea name attribute name="comment "
+        comment.comment = request.POST.get('comment', '').strip() #'comment ' is for in blogs.html textarea name attribute name="comment "
+        parent_id = request.POST.get('parent_id')
+        
+        if comment.comment:
+            comment = Comment(
+                blog=single_blog,
+                user=request.user,
+                comment=comment.comment
+            )
+
+        if parent_id: 
+            comment.parent = Comment.objects.get(id=parent_id)
+
+
+
         comment.save()
-        return redirect('blogs', slug=single_blog.slug)
+        return redirect(request.path)
+        # return redirect('blogs', slug=single_blog.slug)
         # return HttpResponse(request.path_info)  # import httpresponse too
 # comments in each blog post will be shown in blog detail page
     comments = Comment.objects.filter(blog=single_blog).order_by('-created_at')

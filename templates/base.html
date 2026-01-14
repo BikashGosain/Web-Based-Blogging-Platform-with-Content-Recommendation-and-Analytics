@@ -35,6 +35,42 @@ function closeToast(element) {
     toast.classList.add("hide");
     setTimeout(() => toast.remove(), 400);
 }
+
+// it only show or hides the reply box when the user clicks Reply.
+// also form submit reply without page reload
+function toggleReplyForm(commentId) {
+    const form = document.getElementById(`reply-form-${commentId}`);
+    form.classList.toggle('d-none');
+}
+
+// AJAX reply submit (no page reload)
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.reply-form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault(); // STOP reload
+
+            const formData = new FormData(this);
+            const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    this.reset();                 // clear textarea
+                    this.classList.add('d-none'); // hide reply form
+                    location.reload();            // safe update (optional)
+                }
+            });
+        });
+    });
+});
+
+
 </script>
 
 
