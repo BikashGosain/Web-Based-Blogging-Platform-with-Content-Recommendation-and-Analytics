@@ -43,32 +43,7 @@ function toggleReplyForm(commentId) {
     form.classList.toggle('d-none');
 }
 
-// AJAX reply submit (no page reload)
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.reply-form').forEach(form => {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault(); // STOP reload
 
-            const formData = new FormData(this);
-            const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            fetch(window.location.href, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': csrfToken
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    this.reset();                 // clear textarea
-                    this.classList.add('d-none'); // hide reply form
-                    location.reload();            // safe update (optional)
-                }
-            });
-        });
-    });
-});
 
 
 </script>

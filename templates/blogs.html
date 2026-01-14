@@ -29,6 +29,43 @@
 
 
                     <!-- comment section -->
+                    <br><br>
+                    <div class="form-group">
+
+                        {% if user.is_authenticated %}
+                        <h4 class="mb-4">Leave a Comment</h4>
+                        <form action="" method="POST" id="commentForm">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <textarea class="form-control" name="comment" placeholder="Write your comment here..."
+                                    required></textarea>
+                            </div>
+                            <input type="submit" value="Submit Comment" class="btn btn-primary mt-2">
+                        </form>
+
+                        <script>
+                            document.getElementById('commentForm').addEventListener('submit', function (e) {
+                                e.preventDefault();  // stop page reload
+
+                                const formData = new FormData(this);
+
+                                fetch("", {
+                                    method: "POST",
+                                    body: formData,
+                                    headers: {
+                                        "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                                    }
+                                }).then(response => location.reload()); // or update DOM dynamically
+                            });
+                        </script>
+
+                        {% else %}
+                        <p>Please <a href="{% url 'login' %}">login</a> to leave a comment.</p>
+                        {% endif %}
+                    </div>
+
+
+
                     <div class="mt-5">
                         <h4 class="mb-4">Comments ({{ comment_count }})</h4>
                         {% for comment in comments %}
@@ -61,18 +98,13 @@
                                 </form>
 
 
-
-
-                                <!-- Replies -->
-                                {% for reply in comment.replies.all|dictsort:"created_at" %}
-
-                                <div class="ms-4 mt-3 border-start ps-3">
-                                    <small class="text-muted">
-                                        <strong>{{ reply.user }} · {{ reply.created_at|timesince }} ago</strong>
-                                    </small>
-                                    <p>{{ reply.comment }}</p>
-                                </div>
+                                <!-- 🔁 RECURSION HAPPENS HERE -->
+                                {% for reply in comment.replies.all %}
+                                {% include 'blogs/comment.html' with comment=reply level=level|add:1 %}
                                 {% endfor %}
+
+
+
                             </div>
                         </div>
                         {% endif %}
@@ -82,43 +114,11 @@
 
 
                         <br>
-                        <div class="form-group">
-
-                            {% if user.is_authenticated %}
-                            <h4 class="mb-4">Leave a Comment</h4>
-                            <form method="post" action="" method="POST" id="commentForm">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <textarea class="form-control" name="comment"
-                                        placeholder="Write your comment here..." required></textarea>
-                                </div>
-                                <input type="submit" value="Submit Comment" class="btn btn-primary mt-2">
-                            </form>
-
-                            <script>
-                                document.getElementById('commentForm').addEventListener('submit', function (e) {
-                                    e.preventDefault();  // stop page reload
-
-                                    const formData = new FormData(this);
-
-                                    fetch("", {
-                                        method: "POST",
-                                        body: formData,
-                                        headers: {
-                                            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
-                                        }
-                                    }).then(response => location.reload()); // or update DOM dynamically
-                                });
-                            </script>
-
-                            {% else %}
-                            <p>Please <a href="{% url 'login' %}">login</a> to leave a comment.</p>
-                            {% endif %}
-                        </div>
-
+                       
                     </div>
                 </section>
             </article>
+            
         </div>
         <!-- Side widgets-->
         <div class="col-lg-4">
@@ -152,5 +152,41 @@
         </div>
     </div>
 </div>
+
+
+ <!-- Replace your JS with THIS (ONLY ONE SCRIPT, bottom of blogs.html) so that no reload (comment no reload, reply on that comment no reload but reply on that reply take reload) Now no reload now -->
+                        <script>
+                            function toggleReplyForm(id) {
+                                const form = document.getElementById(`reply-form-${id}`);
+                                if (form) {
+                                    form.classList.toggle('d-none');
+                                }
+                            }
+
+                            document.addEventListener('submit', function (e) {
+                                const form = e.target;
+
+                                // 🔑 This catches ALL reply forms (including nested replies)
+                                if (form.querySelector('input[name="parent_id"]')) {
+                                    e.preventDefault(); // STOP page reload
+
+                                    const formData = new FormData(form);
+
+                                    fetch("", {
+                                        method: "POST",
+                                        body: formData,
+                                        headers: {
+                                            "X-CSRFToken": form.querySelector('[name=csrfmiddlewaretoken]').value
+                                        }
+                                    })
+                                        .then(res => {
+                                            if (res.ok) {
+                                                location.reload(); // TEMP: confirms everything works
+                                            }
+                                        });
+                                }
+                            });
+                        </script>
+
 
 {% endblock %}
