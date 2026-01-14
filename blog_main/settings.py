@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap4',
     'dashboards',
+    'ckeditor',
+    'ckeditor_uploader',
 
 ]
 
@@ -133,3 +135,27 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+# You want this 👇
+# Select image from device → upload → auto insert into editor
+
+# To do that in Django, you need:
+
+# django-tinymce (already using)
+
+# Enable file upload support
+
+# Correct TinyMCE configuration
+
+# Media URL working
+
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+    },
+}

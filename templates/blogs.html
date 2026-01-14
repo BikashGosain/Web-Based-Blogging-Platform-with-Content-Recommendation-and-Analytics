@@ -25,7 +25,10 @@
                 <!-- Post content-->
                 <section class="mb-5">
                     <p class="fs-5 mb-4">{{ single_blog.short_description }}</p>
-                    <p class="fs-5 mb-4">{{ single_blog.blog_body }}</p>
+                    <div class="fs-5 mb-4">
+    {{ single_blog.blog_body|safe }}
+</div>
+
 
 
                     <!-- comment section -->
@@ -67,7 +70,11 @@
 
 
                     <div class="mt-5">
-                        <h4 class="mb-4">Comments ({{ comment_count }})</h4>
+                        <!-- comment count after delete without reloading page after delete -->
+                        <h4 class="mb-4">
+    Comments (<span id="comment-count">{{ comment_count }}</span>)
+</h4>
+
                         {% for comment in comments %}
                         {% if not comment.parent %}
                         <div class="card mb-3" id="comment-{{ comment.id }}">
@@ -76,7 +83,7 @@
                                     <strong>{{ comment.user }} · {{ comment.created_at|timesince }} ago</strong>
                                 </small>
 
-                                <!-- for edit and delete comment in main comment only -->
+                                <!-- for edit comment in main comment only -->
                                 <div id="edit-form-{{ comment.id }}" class="d-none mt-2">
                                     <textarea class="form-control mb-2"
                                         id="edit-text-{{ comment.id }}">{{ comment.comment }}</textarea>
@@ -219,31 +226,39 @@
         }
     });
 </script>
-<!-- for Delete comment -->
+
+<!-- for Delete comment and also comment count without fully reload page-->
 <script>
-    function deleteComment(commentId) {
-        if (!confirm("Delete this comment?")) return;
+function deleteComment(commentId) {
+    if (!confirm("Delete this comment?")) return;
 
-        fetch("{% url 'delete_comment' 0 %}".replace("0", commentId), {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": getCSRFToken(),
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById(`comment-${commentId}`).remove();
-                } else {
-                    alert(data.error || "Delete failed");
-                }
-            });
-    }
+    fetch("{% url 'delete_comment' 0 %}".replace("0", commentId), {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // ✅ Remove comment from DOM
+            const el = document.getElementById(`comment-${commentId}`);
+            if (el) el.remove();
 
-    function getCSRFToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]').value;
-    }
+            // ✅ Update comment count
+            const countEl = document.getElementById("comment-count");
+            countEl.innerText = Math.max(0, parseInt(countEl.innerText) - 1);
+        } else {
+            alert(data.error || "Delete failed");
+        }
+    });
+}
+
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
 </script>
+
 
 
 <!-- for edit comment -->

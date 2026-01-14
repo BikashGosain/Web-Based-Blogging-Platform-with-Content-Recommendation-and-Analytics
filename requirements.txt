@@ -1,7 +1,9 @@
 asgiref==3.11.0
 crispy-bootstrap4==2025.6
 Django==6.0.1
+django-ckeditor==6.7.3
 django-crispy-forms==2.5
+django-js-asset==3.1.2
 pillow==12.1.0
 sqlparse==0.5.5
 tzdata==2025.3

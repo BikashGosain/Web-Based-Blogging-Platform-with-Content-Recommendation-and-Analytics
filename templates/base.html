@@ -17,6 +17,7 @@
 
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="{% static 'tinymce/tinymce.min.js' %}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -105,6 +106,16 @@ function toggleReplyForm(commentId) {
         <footer class="blog-footer">
             <p>Django blog built with � by <a href="#"></a>Bikash Gosain</a></p>
         </footer>
+
+        <script>
+tinymce.init({
+    selector: '#id_blog_body',
+    height: 400,
+    menubar: true,
+    plugins: 'lists link image code preview',
+    toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | code preview',
+});
+</script>
 </body>
 
 </html>
