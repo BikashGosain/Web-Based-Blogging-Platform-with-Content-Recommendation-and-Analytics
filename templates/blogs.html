@@ -101,15 +101,15 @@
 
 
                                 {% if request.user == comment.user %}
-                                <button class="btn btn-link p-0 text-success"
-                                    onclick="toggleEditForm({{ comment.id }})">
-                                    <i class="fa fa-edit"></i>
-                                </button>&nbsp;
-                                <button type="button" class="btn btn-link text-danger p-0 ms-2"
-                                    onclick="deleteComment({{ comment.id }})">
-                                    <i class="fa fa-trash text-danger"></i>
-                                </button>
-                                {% endif %}
+            <button class="btn btn-link p-0 text-success" onclick="toggleEditForm({{ comment.id }})">
+                <i class="fa fa-edit"></i>
+            </button>{% endif %}
+            &nbsp;
+            {% if request.user == comment.user or request.user.is_superuser %}
+            <button type="button" class="btn btn-link text-danger p-0 ms-2" onclick="deleteComment({{ comment.id }})">
+                <i class="fa fa-trash text-danger"></i>
+            </button>
+            {% endif %}
 
 
 
