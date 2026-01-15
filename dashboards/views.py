@@ -107,8 +107,18 @@ def add_post(request):
             title = form.cleaned_data['title']
             post.slug = slugify(title) + "-" + str(post.id)  # generating slug from title
             post.save()  # saving again to update the slug
+            messages.success(
+                request,
+                f"✅ New Post titled '{post.title}' added successfully."
+            )
             return redirect('posts')
-    form = BlogPostForm()
+        else:
+            messages.error(
+                request,
+                "❌ Post was not added. Please fill the blog body too below."
+            )
+    else:
+        form = BlogPostForm()
     context = {
         'form': form,
     }
@@ -123,7 +133,16 @@ def edit_post(request, pk):
             title = form.cleaned_data['title']
             post.slug = slugify(title) + "-" + str(post.id)  # updating slug from title
             post.save()  # saving again to update the slug
+            messages.success(
+                request,
+                f"✅Post edited to this Title '{post.title}' successfully."
+            )
             return redirect('posts')
+        else:
+            messages.error(
+                request,
+                "❌ Post was not added. Please fill the blog body too below."
+            )
     form = BlogPostForm(instance=post)
     context = {
         'form': form,
@@ -135,6 +154,10 @@ def edit_post(request, pk):
 def delete_post(request, pk):
     post = get_object_or_404(Blog, pk=pk)
     post.delete()
+    messages.success(
+                request,
+                f"✅Post with Title '{post.title}' deleted successfully."
+            )
     return redirect('posts')
 
 def users(request):
