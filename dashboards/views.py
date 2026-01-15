@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from blogs.models import Category, Blog
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 from .forms import BlogPostForm, CategoryForm, AddUserForm, EditUserForm
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
@@ -9,7 +9,6 @@ from django.template.defaultfilters import slugify
 from django.contrib import messages
 # Create your views here.
 
-@login_required(login_url='login')
 def dashboard(request):
     category_count = Category.objects.all().count()
     blogs_count = Blog.objects.all().count()
@@ -24,36 +23,68 @@ def dashboard(request):
 def catagories(request):
     return render(request, 'dashboard/catagories.html')
 
+# def add_category(request):
+#     if request.method == 'POST':
+#         form = CategoryForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('categories')
+#     form = CategoryForm()
+#     context = {
+#         'form': form,
+#     }
+#     return render(request, 'dashboard/add_category.html', context)
+
 def add_category(request):
-    if request.method == 'POST':
-        form = CategoryForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('categories')
-    form = CategoryForm()
-    context = {
-        'form': form,
-    }
-    return render(request, 'dashboard/add_category.html', context)
+    form = CategoryForm(request.POST or None)
+
+    if request.method == 'POST' and form.is_valid():
+        category = form.save()  # ← THIS line is required
+        messages.success(
+            request,
+            f"✅ Category '{category.category_name}' added successfully."
+        )
+        return redirect('categories')
+
+    return render(
+        request,
+        'dashboard/add_category.html',
+        {'form': form}
+    )
+
+
 
 def edit_category(request, pk):
     category = get_object_or_404(Category, pk=pk)
+
     if request.method == 'POST':
         form = CategoryForm(request.POST, instance=category)
         if form.is_valid():
-            form.save()
+            category = form.save()
+            messages.success(
+                request,
+                f"✅ Category edited to '{category.category_name}' successfully."
+            )
             return redirect('categories')
-    form = CategoryForm(instance=category)
-    context = {
-        'form': form,
-        'category': category,
-    }
-    return render(request, 'dashboard/edit_category.html', context)
+        
+    else:
+        form = CategoryForm(instance=category)
+
+    return render(
+        request,
+        'dashboard/edit_category.html',
+        {'form': form, 'category': category}
+    )
+
 
 @permission_required('auth.delete_user', raise_exception=True)
 def delete_category(request, pk):
     category = get_object_or_404(Category, pk=pk)
     category.delete()
+    messages.success(
+                request,
+                f"✅ Category '{category.category_name}' deleted successfully."
+            )
     return redirect('categories')
 
 
@@ -124,6 +155,11 @@ def add_user(request):
                 f'User "{user.username}" added successfully ✅'
             )
             return redirect('users')
+        else:
+            messages.error(
+                request,
+                "User could not be added. Please fix the errors below ❌"
+            )
     form = AddUserForm()
     context = {
         'form': form,

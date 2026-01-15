@@ -6,6 +6,16 @@
         {% endif %}
         <a href="{% url 'categories' %}" class="nav-link text-dark {% if '/categories/' in request.path %}bg-warning{% endif %}">Categories</a>
         <a href="{% url 'posts' %}" class="nav-link text-dark {% if '/posts/' in request.path %}bg-warning{% endif %}">Posts</a>
-        <a href="" class="nav-link text-dark">Logout</a>
+        <a href="{% url 'logout' %}" class="nav-link text-dark {% if '/logout/' in request.path %}bg-warning{% endif %}">Logout</a>
     </div>
 </div>
+{% if messages %}
+  <div id="toast-container">
+    {% for message in messages %}
+      <div class="toast toast-{{ message.tags }}">
+        <span class="toast-message">{{ message }}</span>
+        <span class="toast-close" onclick="closeToast(this)">&times;</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

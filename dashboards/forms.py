@@ -8,6 +8,25 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = '__all__'
+    
+    # to show exact error in edit catagory field when try to edited to already exixted category: f"Category '{category_name}' already exists."
+    # also show error in addnew category too: f"Category '{category_name}' already exists."
+
+    def clean_category_name(self):
+        category_name = self.cleaned_data.get('category_name')
+
+        qs = Category.objects.filter(category_name__iexact=category_name)
+
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise forms.ValidationError(
+                f"Category '{category_name}' already exists."
+            )
+
+        return category_name
+        
 
 class BlogPostForm(forms.ModelForm):
     class Meta:

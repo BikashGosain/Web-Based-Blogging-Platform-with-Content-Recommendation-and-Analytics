@@ -65,7 +65,7 @@ def delete_comment(request, comment_id):
     if request.method == "POST":
         comment = get_object_or_404(Comment, id=comment_id)
 
-        if comment.user != request.user:
+        if comment.user != request.user and not request.user.is_superuser:
             return JsonResponse({'error': 'Permission denied'}, status=403)
 
         comment.delete()

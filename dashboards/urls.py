@@ -1,24 +1,25 @@
 from django.urls import path
+from django.contrib.auth.decorators import login_required
 from . import views
 
 urlpatterns = [
     # Dashboard Home
-    path('', views.dashboard, name='dashboard'),
-    # Category crud
-    path('categories/', views.catagories, name='categories'),  # Example additional URL
-    path('categories/add/', views.add_category, name='add_category'),  # Example additional URL
-    path('categories/edit/<int:pk>/', views.edit_category, name='edit_category'),
-    path('categories/delete/<int:pk>/', views.delete_category, name='delete_category'),
+    path('', login_required(views.dashboard, login_url='login'), name='dashboard'),
+    # Category CRUD
+    path('categories/', login_required(views.catagories, login_url='login'), name='categories'),
+    path('categories/add/', login_required(views.add_category, login_url='login'), name='add_category'),
+    path('categories/edit/<int:pk>/', login_required(views.edit_category, login_url='login'), name='edit_category'),
+    path('categories/delete/<int:pk>/', login_required(views.delete_category, login_url='login'), name='delete_category'),
 
-    # blog post crud
-    path('posts/', views.posts, name='posts'),
-    path('posts/add/', views.add_post, name='add_post'),
-    path('posts/edit/<int:pk>/', views.edit_post, name='edit_post'),
-    path('posts/delete/<int:pk>/', views.delete_post, name='delete_post'),
+    # Blog post CRUD
+    path('posts/', login_required(views.posts, login_url='login'), name='posts'),
+    path('posts/add/', login_required(views.add_post, login_url='login'), name='add_post'),
+    path('posts/edit/<int:pk>/', login_required(views.edit_post, login_url='login'), name='edit_post'),
+    path('posts/delete/<int:pk>/', login_required(views.delete_post, login_url='login'), name='delete_post'),
     
     # users management by manager and admin through dashboard
-    path('users/', views.users, name='users'),
-    path('users/add/', views.add_user, name='add_user'),
-    path('users/edit/<int:pk>/', views.edit_user, name='edit_user'),
-    path('users/delete/<int:pk>/', views.delete_user, name='delete_user'),
+    path('users/', login_required(views.users, login_url='login'), name='users'),
+    path('users/add/', login_required(views.add_user, login_url='login'), name='add_user'),
+    path('users/edit/<int:pk>/', login_required(views.edit_user, login_url='login'), name='edit_user'),
+    path('users/delete/<int:pk>/', login_required(views.delete_user, login_url='login'), name='delete_user'),
 ]
