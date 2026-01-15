@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import permission_required
 from .forms import BlogPostForm, CategoryForm, AddUserForm, EditUserForm
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
-# edited
+# edited agian edited
 # for message
 from django.contrib import messages
 # Create your views here.
